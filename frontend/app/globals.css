@@ -1,0 +1,101 @@
+/* stylelint-disable at-rule-no-unknown */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+  html { @apply scroll-smooth; }
+  body { @apply bg-gray-50 text-slate-800 antialiased font-sans leading-relaxed; }
+}
+
+/* Enhanced Component classes */
+@layer components {
+  /* Form Controls */
+  .input { 
+    @apply w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-sm 
+    placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 
+    focus:border-brand-500 transition-all duration-200 hover:border-gray-300; 
+  }
+  .input-error { @apply input border-red-300 focus:ring-red-500 focus:border-red-500; }
+  
+  /* Button System */
+  .btn { 
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-medium 
+    transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 
+    disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none; 
+  }
+  .btn-primary { 
+    @apply btn bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700 
+    focus:ring-brand-500 shadow-sm hover:shadow-md; 
+  }
+  /* Secondary button (accent palette). Requires accent-500/600/700 in tailwind.config.js */
+  .btn-secondary { 
+    @apply btn bg-accent-500 text-white hover:bg-accent-600 active:bg-accent-700 
+    focus:ring-accent-500 shadow-sm hover:shadow-md; 
+  }
+  .btn-outline { 
+    @apply btn border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 
+    active:bg-gray-100 focus:ring-gray-400 shadow-sm hover:shadow-md; 
+  }
+  .btn-ghost { 
+    @apply btn text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-400; 
+  }
+  
+  /* Card System */
+  .card { 
+    @apply bg-white rounded-xl shadow-card border border-gray-100 overflow-hidden 
+    transition-all duration-200 hover:shadow-card-hover; 
+  }
+  .card-body { @apply p-6; }
+  .card-compact { @apply card; }
+  .card-compact .card-body { @apply p-4; }
+  
+  /* Product Card Specific */
+  .product-card {
+    /* Removed 'group' from @apply (Tailwind disallows applying group utility) */
+    @apply card cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1;
+  }
+  .product-image {
+    @apply w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300;
+  }
+  
+  /* Navigation */
+  .nav-link {
+    @apply text-gray-600 hover:text-brand-600 font-medium transition-colors duration-200
+    relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
+    after:bg-brand-500 after:transition-all after:duration-200 hover:after:w-full;
+  }
+  .nav-link-active {
+    @apply nav-link text-brand-600 after:w-full;
+  }
+  
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-primary { @apply badge bg-brand-100 text-brand-800; }
+  .badge-success { @apply badge bg-green-100 text-green-800; }
+  .badge-warning { @apply badge bg-yellow-100 text-yellow-800; }
+  .badge-error { @apply badge bg-red-100 text-red-800; }
+  
+  /* Container System */
+  .container-sm { @apply max-w-2xl mx-auto px-4; }
+  .container-md { @apply max-w-4xl mx-auto px-4; }
+  .container-lg { @apply max-w-6xl mx-auto px-4; }
+  .container-xl { @apply max-w-7xl mx-auto px-4; }
+}
+
+/* Utility additions */
+@layer utilities {
+  /* Removed redundant animate-* re-definitions to avoid circular @apply. Use the Tailwind classes directly: animate-fade-in, animate-slide-up, animate-bounce-in */
+
+  /* Text utilities */
+  .text-balance { text-wrap: balance; }
+  
+  /* Gradient utilities */
+  .gradient-brand { @apply bg-gradient-to-r from-brand-500 to-brand-600; }
+  .gradient-accent { @apply bg-gradient-to-r from-accent-500 to-orange-500; }
+}
+/* stylelint-enable at-rule-no-unknown */

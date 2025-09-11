@@ -1,5 +1,5 @@
-Flask==3.0.3
-Flask-PyMongo==2.3.0
-Flask-JWT-Extended==4.6.0
-bcrypt==4.1.2
-python-dotenv==1.0.1
+flask
+flask-pymongo
+flask-bcrypt
+flask-jwt-extended
+python-dotenv

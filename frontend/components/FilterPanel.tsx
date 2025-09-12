@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 
 interface FilterPanelProps {
   categories: string[];
+  initialSearch?: string;
   onApply: (filters: { category?: string; minPrice?: number; maxPrice?: number; search?: string }) => void;
 }
 
@@ -75,7 +76,7 @@ export default function FilterPanel({ categories, onApply }: FilterPanelProps) {
       <div className="relative">
         <input
           type="text"
-          placeholder="Search items..."
+          placeholder="Search items... (e.g., tshirt, laptop)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="input pl-10 w-full"

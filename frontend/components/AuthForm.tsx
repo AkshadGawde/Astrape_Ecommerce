@@ -1,7 +1,8 @@
 import { useState } from "react";
 
+interface AuthFormData { email: string; password: string; username?: string }
 interface AuthFormProps {
-  onSubmit: (data: { email: string; password: string; username?: string }) => void;
+  onSubmit: (data: AuthFormData) => Promise<void> | void;
   isSignup?: boolean;
 }
 
@@ -13,14 +14,20 @@ const AuthForm = ({ onSubmit, isSignup = false }: AuthFormProps) => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
       await onSubmit({ email, password, username: isSignup ? username : undefined });
-    } catch (err: any) {
-      setError(err.response?.data?.msg || err.message || "Something went wrong");
+    } catch (err: unknown) {
+      let message = "Something went wrong";
+      if (typeof err === 'object' && err !== null) {
+        const responseData = (err as { response?: { data?: { msg?: string } } }).response?.data;
+        const errMessage = (err as { message?: string }).message;
+        message = responseData?.msg || errMessage || message;
+      }
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -47,7 +54,7 @@ const AuthForm = ({ onSubmit, isSignup = false }: AuthFormProps) => {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-gradient-brand rounded-xl flex items-center justify-center shadow-lg mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">E</span>
+                <span className="text-black font-bold text-2xl">E</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 {isSignup ? "Create Account" : "Welcome Back"}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 
 interface ItemCardProps {
   id: string;
@@ -9,24 +9,32 @@ interface ItemCardProps {
   stock: number;
   rating?: number;
   category?: string;
-  onAddToCart: (item: { id: string; name: string; image?: string; price: number; stock: number; }) => Promise<void>;
+  onAddToCart: (item: {
+    id: string;
+    name: string;
+    image?: string;
+    price: number;
+    stock: number;
+  }) => Promise<void>;
 }
 
-const ItemCard = ({ 
-  id, 
-  name, 
-  image, 
-  price, 
-  stock, 
-  rating = 4.5, 
+const ItemCard = ({
+  id,
+  name,
+  image,
+  price,
+  stock,
+  rating = 4.5,
   category = "General",
-  onAddToCart 
+  onAddToCart,
 }: ItemCardProps) => {
   const [loading, setLoading] = useState(false);
-  
-  // Generate a consistent placeholder image based on product id
-  const placeholderImage = `https://picsum.photos/seed/${id}/400/300`;
-  const safeImage = image || placeholderImage;
+
+  // ✅ Static mapping for demo
+  let safeImage = image || "/tshirt.jpg";
+  const lower = name.toLowerCase();
+  if (lower.includes("laptop")) safeImage = "/laptop.jpeg";
+  if (lower.includes("t-shirt") || lower.includes("tshirt")) safeImage = "/tshirt.jpeg";
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,7 +50,9 @@ const ItemCard = ({
     return Array.from({ length: 5 }, (_, i) => (
       <svg
         key={i}
-        className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-200'}`}
+        className={`w-4 h-4 ${
+          i < Math.floor(rating) ? "text-yellow-400" : "text-gray-200"
+        }`}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -52,108 +62,80 @@ const ItemCard = ({
   };
 
   return (
-  <div className="product-card group animate-fade-in">
-      {/* Image Container */}
-      <div className="relative overflow-hidden rounded-t-xl bg-gray-100">
-        <div className="relative w-full h-48">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md hover:border-gray-200 transition-all duration-300">
+      {/* Image */}
+      <div className="relative overflow-hidden bg-gray-50">
+        <div className="relative w-full h-40 sm:h-44 lg:h-48">
           <Image
             src={safeImage}
             alt={name}
             fill
-            className="product-image"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
           />
-        </div>
-        
-        {/* Stock Status Badge */}
-        <div className="absolute top-3 left-3">
-          {stock > 10 ? (
-            <span className="badge-success">In Stock</span>
-          ) : stock > 0 ? (
-            <span className="badge-warning">Low Stock</span>
-          ) : (
-            <span className="badge-error">Out of Stock</span>
-          )}
-        </div>
-
-        {/* Category Badge */}
-        <div className="absolute top-3 right-3">
-          <span className="badge-primary">{category}</span>
-        </div>
-
-        {/* Quick Add Overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <button
-            onClick={handleAddToCart}
-            disabled={loading || stock === 0}
-            className="btn-primary px-6 py-2 shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300"
-          >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Adding...
-              </div>
-            ) : stock === 0 ? (
-              'Out of Stock'
-            ) : (
-              'Quick Add'
-            )}
-          </button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="card-body">
+      <div className="p-3 sm:p-4">
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex items-center">
-            {renderStars(rating)}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1">
+            <div className="flex items-center">{renderStars(rating)}</div>
+            <span className="text-xs text-gray-400 ml-1">({rating})</span>
           </div>
-          <span className="text-sm text-gray-500 ml-1">
-            ({rating})
+          <div className="text-xs font-medium text-green-600">
+            In Stock
+          </div>
+        </div>
+
+        {/* Name + Category */}
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="font-medium text-gray-900 text-sm sm:text-base line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight flex-1 mr-2">
+            {name}
+          </h3>
+          <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-200 whitespace-nowrap">
+            {category}
           </span>
         </div>
 
-        {/* Product Name */}
-        <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">
-          {name}
-        </h3>
-
-        {/* Price and Stock Info */}
-        <div className="flex items-center justify-between mb-4">
+        {/* Price */}
+        <div className="flex items-center justify-between mb-3">
           <div className="flex flex-col">
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-lg sm:text-xl font-semibold text-gray-900">
               ${price.toFixed(2)}
             </span>
-            <span className="text-sm text-gray-500">
-              {stock} left
-            </span>
+            <span className="text-xs text-gray-400">{stock} left</span>
           </div>
         </div>
 
-        {/* Add to Cart Button */}
+        {/* Add to Cart */}
         <button
           onClick={handleAddToCart}
-          disabled={loading || stock === 0}
-          className={`w-full transition-all duration-200 ${
-            stock === 0 
-              ? 'btn-outline opacity-50 cursor-not-allowed' 
-              : 'btn-primary hover:shadow-lg active:scale-[0.98]'
-          }`}
+          disabled={loading}
+          className="w-full py-2 sm:py-2.5 px-3 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              Adding to Cart...
+              <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span className="text-xs sm:text-sm">Adding...</span>
             </div>
-          ) : stock === 0 ? (
-            'Out of Stock'
           ) : (
             <div className="flex items-center justify-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5M7 13v8a2 2 0 002 2h4.5a2 2 0 002-2v-8m-8.5 0h8.5" />
+              <svg
+                className="w-3 h-3 sm:w-4 sm:h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5M7 13v8a2 2 0 002 2h4.5a2 2 0 002-2v-8m-8.5 0h8.5"
+                />
               </svg>
-              Add to Cart
+              <span className="text-xs sm:text-sm">Add to Cart</span>
             </div>
           )}
         </button>

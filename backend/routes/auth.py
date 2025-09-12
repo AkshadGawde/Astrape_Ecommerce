@@ -50,5 +50,10 @@ def login():
         return jsonify({"msg": "Invalid credentials"}), 401
 
     user_id = str(user["_id"])
-    access_token = create_access_token(identity=user_id)
+    # Include user details in JWT payload
+    additional_claims = {
+        "email": user["email"],
+        "username": user.get("username", "")
+    }
+    access_token = create_access_token(identity=user_id, additional_claims=additional_claims)
     return jsonify({"access_token": access_token, "user": {"id": user_id, "email": user["email"], "username": user.get("username", "")}})

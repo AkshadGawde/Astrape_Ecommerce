@@ -5,6 +5,8 @@ import { jwtDecode } from "jwt-decode";
 interface DecodedToken {
   sub?: string;
   exp?: number; // seconds epoch
+  email?: string;
+  username?: string;
   [key: string]: unknown;
 }
 
@@ -53,7 +55,11 @@ export const getUserFromToken = (): BasicUser | null => {
       removeToken();
       return null;
     }
-  return decoded.sub ? { id: decoded.sub } : null;
+  return decoded.sub ? { 
+    id: decoded.sub,
+    email: decoded.email,
+    username: decoded.username
+  } : null;
   } catch (err) {
     console.error("Failed to decode JWT:", err);
     removeToken();

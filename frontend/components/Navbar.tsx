@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { usePathname } from "next/navigation";
@@ -8,7 +10,46 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { cart, loading } = useCart();
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
   const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Handle hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Handle search functionality with preprocessing
+  const preprocessSearchQuery = (query: string) => {
+    // Normalize common search variations
+    return query
+      .toLowerCase()
+      .replace(/\bt[-\s]?shirt\b/g, 'tshirt t-shirt shirt') // Handle t-shirt variations
+      .replace(/\btshirt\b/g, 'tshirt t-shirt shirt')
+      .replace(/\blaptop\b/g, 'laptop computer')
+      .replace(/\bcomputer\b/g, 'laptop computer')
+      .replace(/\bphone\b/g, 'phone mobile smartphone')
+      .replace(/\bmobile\b/g, 'phone mobile smartphone')
+      .trim();
+  };
+
+  const handleSearch = (query: string, event: React.FormEvent | React.KeyboardEvent) => {
+    event.preventDefault();
+    if (query.trim()) {
+      const processedQuery = preprocessSearchQuery(query.trim());
+      router.push(`/items?search=${encodeURIComponent(processedQuery)}`);
+    } else {
+      router.push('/items');
+    }
+  };
+
+  const handleKeyPress = (query: string, event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleSearch(query, event);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
@@ -18,7 +59,7 @@ export default function Navbar() {
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="w-10 h-10 bg-gradient-brand rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-200">
-                <span className="text-white font-bold text-lg">E</span>
+                <span className="text-black font-bold text-lg">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors">
                 EliteShop
@@ -33,29 +74,29 @@ export default function Navbar() {
               >
                 Products
               </Link>
-              <Link 
-                href="/categories" 
-                className={pathname === "/categories" ? "nav-link-active" : "nav-link"}
-              >
-                Categories
-              </Link>
             </div>
           </div>
 
           {/* Search Bar (Hidden on mobile, shown on md+) */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
+            <form onSubmit={(e) => handleSearch(searchQuery, e)} className="relative w-full">
               <input
                 type="search"
-                placeholder="Search products..."
-                className="input pl-10 pr-4"
+                placeholder="Search products... (e.g., tshirt, laptop)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => handleKeyPress(searchQuery, e)}
+                className="input pl-10 pr-4 w-full focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
               />
-              <div className="absolute left-3 top-1/2 -translate-y-1/2">
+              <button
+                type="submit"
+                className="absolute left-3 top-1/2 -translate-y-1/2 hover:text-blue-600 transition-colors"
+              >
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-              </div>
-            </div>
+              </button>
+            </form>
           </div>
 
           {/* Right Section */}
@@ -81,7 +122,13 @@ export default function Navbar() {
             </Link>
 
             {/* User Section */}
-            {user ? (
+            {!mounted ? (
+              // Show loading state during hydration
+              <div className="flex items-center gap-3">
+                <div className="w-16 h-8 bg-gray-100 rounded animate-pulse"></div>
+                <div className="w-16 h-8 bg-gray-100 rounded animate-pulse"></div>
+              </div>
+            ) : user ? (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
                   <div className="w-8 h-8 bg-brand-500 rounded-full flex items-center justify-center">
@@ -121,18 +168,24 @@ export default function Navbar() {
 
         {/* Mobile Search Bar */}
         <div className="md:hidden mt-4">
-          <div className="relative">
+          <form onSubmit={(e) => handleSearch(mobileSearchQuery, e)} className="relative">
             <input
               type="search"
-              placeholder="Search products..."
-              className="input pl-10 pr-4"
+              placeholder="Search products... (e.g., tshirt, laptop)"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              onKeyPress={(e) => handleKeyPress(mobileSearchQuery, e)}
+              className="input pl-10 pr-4 w-full focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
             />
-            <div className="absolute left-3 top-1/2 -translate-y-1/2">
+            <button
+              type="submit"
+              className="absolute left-3 top-1/2 -translate-y-1/2 hover:text-blue-600 transition-colors"
+            >
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-            </div>
-          </div>
+            </button>
+          </form>
         </div>
       </div>
     </nav>

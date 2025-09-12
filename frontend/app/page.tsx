@@ -11,7 +11,8 @@ export default function HomePage() {
   const { user } = useAuth();
 
   // Fetch featured products
-  const { data: featuredItems = [] } = useQuery({
+  interface Item { id: string; name: string; image?: string; price: number; stock: number; rating?: number; category?: string }
+  const { data: featuredItems = [] } = useQuery<Item[]>({
     queryKey: ["featured-items"],
     queryFn: async () => {
       try {
@@ -172,7 +173,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredItems.slice(0, 8).map((item: any) => (
+              {featuredItems.slice(0, 8).map((item: Item) => (
                 <ItemCard
                   key={item.id}
                   {...item}

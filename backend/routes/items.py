@@ -27,17 +27,53 @@ def get_items():
     query = {}
 
     category = request.args.get("category")
-    search = request.args.get("search")
+    navbar_search = request.args.get("navbarSearch")
+    filter_search = request.args.get("filterSearch")
     min_price = request.args.get("minPrice")
     max_price = request.args.get("maxPrice")
+    sort_by = request.args.get("sortBy", "name")  # default to name
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("pageSize", 20))
 
     if category:
         query["category"] = category
-    if search:
-        # basic case-insensitive regex search on name
-        query["name"] = {"$regex": search, "$options": "i"}
+    
+    # Handle both navbar search and filter panel search
+    search_patterns = []
+    
+    if navbar_search:
+        # Enhanced flexible search for navbar: split search terms and create multiple search patterns
+        search_terms = navbar_search.lower().split()
+        
+        for term in search_terms:
+            # Create flexible patterns for each term
+            patterns = [
+                {"name": {"$regex": term, "$options": "i"}},
+                {"category": {"$regex": term, "$options": "i"}},
+                {"description": {"$regex": term, "$options": "i"}},
+                # Handle common variations and abbreviations
+                {"name": {"$regex": term.replace("shirt", "t-shirt"), "$options": "i"}},
+                {"name": {"$regex": term.replace("tshirt", "t-shirt"), "$options": "i"}},
+                {"name": {"$regex": term.replace("t-shirt", "shirt"), "$options": "i"}},
+                {"name": {"$regex": term.replace("laptop", "computer"), "$options": "i"}},
+                {"name": {"$regex": term.replace("computer", "laptop"), "$options": "i"}},
+                {"category": {"$regex": term.replace("shirt", "clothing"), "$options": "i"}},
+                {"category": {"$regex": term.replace("tshirt", "clothing"), "$options": "i"}},
+                {"category": {"$regex": term.replace("laptop", "electronics"), "$options": "i"}},
+            ]
+            search_patterns.extend(patterns)
+    
+    if filter_search:
+        # Simple search for filter panel
+        search_patterns.extend([
+            {"name": {"$regex": filter_search, "$options": "i"}},
+            {"category": {"$regex": filter_search, "$options": "i"}},
+            {"description": {"$regex": filter_search, "$options": "i"}}
+        ])
+    
+    # Use OR condition to match any of the patterns if there are search terms
+    if search_patterns:
+        query["$or"] = search_patterns
     price_filter = {}
     try:
         if min_price is not None:
@@ -49,7 +85,27 @@ def get_items():
     if price_filter:
         query["price"] = price_filter
 
-    cursor = items_col.find(query).skip((page - 1) * page_size).limit(page_size)
+    # Handle sorting
+    sort_direction = 1  # ascending by default
+    sort_field = "name"  # default field
+    
+    if sort_by.startswith("-"):
+        sort_direction = -1
+        sort_field = sort_by[1:]  # remove the minus sign
+    else:
+        sort_field = sort_by
+    
+    # Map frontend sort options to database fields
+    if sort_field == "price":
+        sort_field = "price"
+    elif sort_field == "rating":
+        sort_field = "rating"
+    elif sort_field == "stock":
+        sort_field = "stock"
+    else:
+        sort_field = "name"  # default to name for any other value
+
+    cursor = items_col.find(query).sort(sort_field, sort_direction).skip((page - 1) * page_size).limit(page_size)
     items = []
     for i in cursor:
         i["id"] = str(i["_id"])

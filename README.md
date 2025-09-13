@@ -1,105 +1,116 @@
-# E-Commerce Application
+# E-Commerce Web App
 
-Full-stack e-commerce app with JWT authentication, product filtering, and persistent shopping cart.
+A simple single-page e-commerce application built with:
+	•	Backend: Flask + MongoDB (Render)
+	•	Frontend: Next.js + TypeScript + TailwindCSS (Vercel)
+	•	Database: MongoDB Atlas
+	•	Auth: JWT Authentication
 
-## ✅ Requirements Met
+⸻
 
-**Backend:**
-- JWT Authentication (signup/login)
-- Items CRUD with filters (price, category, search)
-- Cart APIs (add/update/remove/persist)
+✨ Features
+	•	User authentication (signup, login) with JWT
+	•	Item listing with filters (category, price)
+	•	Add to Cart / Remove from Cart
+	•	Persistent Cart (saved in DB, available after logout/login)
+	•	Protected Cart Route (only logged-in users can access)
+	•	Responsive UI with TailwindCSS
 
-**Frontend:**
-- Signup & Login pages
-- Product listing with filters & search
-- Shopping cart with persistence after logout
+⸻
 
-## � Quick Start
+⚙️ Backend Setup (Flask + MongoDB)
 
-### 1. Backend Setup
-```bash
-cd backend
-pip install -r requirements.txt
-```
+1. Clone repo & move to backend
 
-Create `.env` file:
-```env
+git clone https://github.com/your-username/your-repo.git
+cd your-repo/backend
+
+2. Environment Variables (backend)
+
+Your current working config (.env):
+
 MONGO_URI=mongodb+srv://akshad:1234567$@cluster0.au9cfhm.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0
 JWT_SECRET_KEY=supersecretkey123
 BACKEND_URL=https://astrape-ecommerce-y090.onrender.com
-```
 
-```bash
+3. Install dependencies
+
+pip install -r requirements.txt
+
+4. Run locally
+
 python app.py
-```
-Backend runs on `http://localhost:5000`
 
-### 2. Frontend Setup
-```bash
-cd frontend
+5. Deploy (Render)
+	•	Root Directory: backend/
+	•	Build Command: pip install -r requirements.txt
+	•	Start Command: gunicorn app:app
+	•	Add same env vars in Render Dashboard
+
+⸻
+
+🎨 Frontend Setup (Next.js + TailwindCSS)
+
+1. Move to frontend
+
+cd ../frontend
+
+2. Environment Variables (frontend) 
+
+Your current working config (.env.local):
+
+NEXT_PUBLIC_API_URL=https://astrape-ecommerce-y090.onrender.com
+
+3. Install dependencies
+
 npm install
+
+4. Run locally
+
 npm run dev
-```
-Frontend runs on `http://localhost:3000`
 
-## 🧪 Testing Guide
+App runs at → http://localhost:3000
 
-1. **Authentication**: Visit `/signup` → create account → login
-2. **Products**: Visit `/items` → test search, filters, sorting
-3. **Cart**: Add items as guest → login → verify cart merge → test cart page
-4. **Persistence**: Logout → verify cart items remain
+5. Deploy (Vercel)
+	•	Root Directory: frontend/
+	•	Add env var NEXT_PUBLIC_API_URL pointing to your Render backend URL
 
-### API Testing
-```bash
-# Signup
-curl -X POST http://localhost:5000/auth/signup \
+⸻
+
+🔑 Auth Flow
+	1.	Signup → user registers with email/password/username
+	2.	Login → user receives JWT token
+	3.	Protected Routes → /cart requires token, /items is public
+	4.	Cart Persistence → cart saved per user in MongoDB
+
+⸻
+
+🧪 API Testing
+
+Use Postman or curl:
+
+Signup:
+curl -X POST https://astrape-ecommerce-y090.onrender.com/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@test.com","password":"password123","username":"testuser"}'
+  -d '{"username":"john","email":"john@example.com","password":"123456"}'
 
-# Login
-curl -X POST http://localhost:5000/auth/login \
+Login:
+curl -X POST https://astrape-ecommerce-y090.onrender.com/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@test.com","password":"password123"}'
+  -d '{"email":"john@example.com","password":"123456"}'
 
-# Get items with filters
-curl "http://localhost:5000/items?category=Electronics&minPrice=100&navbarSearch=laptop"
-```
+Use returned token in requests:
+Authorization: Bearer <your_token>
 
-## 🛠️ Tech Stack
+⸻
 
-- **Backend**: Flask, MongoDB Atlas, JWT
-- **Frontend**: Next.js, TypeScript, Tailwind CSS, React Query
+Tech Stack 
+	•	Frontend: Next.js 14, TypeScript, TailwindCSS
+	•	Backend: Flask, Flask-JWT-Extended, Flask-PyMongo
+	•	Database: MongoDB Atlas
+	•	Deployment: Render (backend), Vercel (frontend)
 
-## 📁 Key Files
+⸻
 
-```
-backend/
-├── app.py              # Main Flask app
-├── routes/auth.py      # Authentication
-├── routes/items.py     # Product CRUD + filters
-└── routes/cart.py      # Cart management
-
-frontend/
-├── app/login/          # Login page
-├── app/signup/         # Signup page
-├── app/items/          # Product listing
-├── app/cart/           # Shopping cart
-└── components/         # Reusable components
-```
-
-## � API Endpoints
-
-- `POST /auth/signup` - User registration
-- `POST /auth/login` - User login
-- `GET /items` - Get items with filters (`?category=X&minPrice=Y&maxPrice=Z&navbarSearch=text`)
-- `POST /cart/add` - Add to cart
-- `GET /cart` - Get user cart
-- `POST /cart/update` - Update quantity
-- `POST /cart/remove` - Remove item
-- `POST /cart/merge` - Merge guest cart
-
-**Database**: Pre-configured MongoDB Atlas - no setup required!
-
----
-
-**Ready to test**: Just follow the Quick Start guide above. All credentials are provided.
+👨‍💻 Author
+Built by Akshad Gawde for internship assignment.

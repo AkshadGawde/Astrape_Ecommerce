@@ -26,6 +26,7 @@ Create `.env` file:
 ```env
 MONGO_URI=mongodb+srv://akshad:1234567$@cluster0.au9cfhm.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0
 JWT_SECRET_KEY=supersecretkey123
+BACKEND_URL=https://astrape-ecommerce-y090.onrender.com
 ```
 
 ```bash

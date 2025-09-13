@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "http://127.0.0.1:5000"; // your backend URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://astrape-ecommerce-y090.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE,
